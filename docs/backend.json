@@ -1,0 +1,165 @@
+{
+  "entities": {
+    "Keyword": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Keyword",
+      "type": "object",
+      "description": "Represents a keyword used for SEO analysis.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the keyword."
+        },
+        "keywordText": {
+          "type": "string",
+          "description": "The actual keyword text."
+        },
+        "embedding": {
+          "type": "array",
+          "description": "Vector embedding representing the semantic meaning of the keyword.",
+          "items": {
+            "type": "number"
+          }
+        },
+        "clusterId": {
+          "type": "string",
+          "description": "Reference to KeywordCluster. (Relationship: KeywordCluster 1:N Keyword)"
+        }
+      },
+      "required": [
+        "id",
+        "keywordText",
+        "embedding"
+      ]
+    },
+    "KeywordCluster": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "KeywordCluster",
+      "type": "object",
+      "description": "Represents a cluster of related keywords.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the keyword cluster."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the keyword cluster."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the intent and topics covered by the cluster."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
+    },
+    "ContentSuggestion": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ContentSuggestion",
+      "type": "object",
+      "description": "Represents a content suggestion generated for a specific keyword cluster.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the content suggestion."
+        },
+        "clusterId": {
+          "type": "string",
+          "description": "Reference to KeywordCluster. (Relationship: KeywordCluster 1:N ContentSuggestion)"
+        },
+        "suggestionText": {
+          "type": "string",
+          "description": "The AI-generated content suggestion text."
+        },
+        "keywords": {
+          "type": "string",
+          "description": "The string of related keywords that the content suggestion is being based on"
+        }
+      },
+      "required": [
+        "id",
+        "clusterId",
+        "suggestionText"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/user"
+          },
+          "description": "Collection to store user-specific data (e.g., profile information, settings).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/keywordClusters/{keywordClusterId}",
+        "definition": {
+          "entityName": "KeywordCluster",
+          "schema": {
+            "$ref": "#/backend/entities/KeywordCluster"
+          },
+          "description": "Collection of keyword clusters. No denormalized authorization fields are required because keyword clusters are designed to be public.",
+          "params": [
+            {
+              "name": "keywordClusterId",
+              "description": "The unique identifier for the keyword cluster."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/keywords/{keywordId}",
+        "definition": {
+          "entityName": "Keyword",
+          "schema": {
+            "$ref": "#/backend/entities/Keyword"
+          },
+          "description": "Collection of keywords. No denormalized authorization fields are required because keywords are designed to be public.",
+          "params": [
+            {
+              "name": "keywordId",
+              "description": "The unique identifier for the keyword."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/contentSuggestions/{contentSuggestionId}",
+        "definition": {
+          "entityName": "ContentSuggestion",
+          "schema": {
+            "$ref": "#/backend/entities/ContentSuggestion"
+          },
+          "description": "Collection of content suggestions. No denormalized authorization fields are required because content suggestions are designed to be public.",
+          "params": [
+            {
+              "name": "contentSuggestionId",
+              "description": "The unique identifier for the content suggestion."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the semantic SEO analyzer application, focusing on keyword management, clustering, and content suggestion generation. The structure adheres to the principle of Authorization Independence by denormalizing ownership where needed and uses structural segregation to ensure consistent security postures. This is achieved by placing user-specific data under `/users/{userId}` and using dedicated collections for global data.  Keyword Clusters are stored under `/keywordClusters/{keywordClusterId}` and content suggestions are organized in a flat collection named `/contentSuggestions`. This segregation facilitates simple `list` operations, and supports the required QAPs, because listing does not require complex filtering based on user roles or permissions. Since keyword clusters and content suggestions are intended for collaborative use or are globally accessible, their security is managed without direct hierarchical dependencies. The structure supports atomic operations and simplifies security rule creation by avoiding the need for `get()` calls to parent documents."
+  }
+}

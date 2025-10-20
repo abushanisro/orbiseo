@@ -1,0 +1,103 @@
+/**
+ * @fileoverview Firestore Security Rules for the semantic SEO analyzer application.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes data security and access control for user-specific
+ * data while allowing open access to global content like keyword clusters and
+ * content suggestions. It enforces a strict user-ownership model for data
+ * stored under `/users/{userId}` and assumes public read access for all other
+ * collections.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores private user data, accessible only to the
+ *   authenticated user.
+ * - /keywordClusters/{keywordClusterId}: Stores keyword cluster data, publicly
+ *   readable.
+ * - /keywords/{keywordId}: Stores keyword data, publicly readable.
+ * - /contentSuggestions/{contentSuggestionId}: Stores content suggestion data,
+ *   publicly readable.
+ *
+ * Key Security Decisions:
+ * - User data under `/users/{userId}` is strictly controlled by the
+ *   authenticated user.
+ * - Listing of user documents is disallowed.
+ * - Keyword clusters, keywords, and content suggestions are publicly readable,
+ *   allowing for open data access.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Enforces user-specific data access. Only the authenticated user can read and write their own data.
+     * @path /users/{userId}
+     * @allow (get, create, update, delete, list) if the request is made by the user with ID {userId}.
+     * @deny (get, create, update, delete, list) if the request is made by a different user.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    /**
+     * @description Allows public read access to keyword clusters. Any authenticated user can read keyword clusters.
+     * @path /keywordClusters/{keywordClusterId}
+     * @allow (get, list) if true, allowing public read access.
+     * @allow (create, update, delete) if false, restricting write access.
+     * @deny (create, update, delete) always, since writes are not allowed.
+     * @principle Allows public read access while restricting write access.
+     */
+    match /keywordClusters/{keywordClusterId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows public read access to keywords. Any authenticated user can read keywords.
+     * @path /keywords/{keywordId}
+     * @allow (get, list) if true, allowing public read access.
+     * @allow (create, update, delete) if false, restricting write access.
+     * @deny (create, update, delete) always, since writes are not allowed.
+     * @principle Allows public read access while restricting write access.
+     */
+    match /keywords/{keywordId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows public read access to content suggestions. Any authenticated user can read content suggestions.
+     * @path /contentSuggestions/{contentSuggestionId}
+     * @allow (get, list) if true, allowing public read access.
+     * @allow (create, update, delete) if false, restricting write access.
+     * @deny (create, update, delete) always, since writes are not allowed.
+     * @principle Allows public read access while restricting write access.
+     */
+    match /contentSuggestions/{contentSuggestionId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+  }
+}

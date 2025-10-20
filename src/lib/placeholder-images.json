@@ -1,0 +1,16 @@
+{
+  "placeholderImages": [
+    {
+      "id": "ab-testing-placeholder",
+      "description": "An illustration showing the difference between SEO Split Testing and standard A/B testing.",
+      "imageUrl": "https://www.seoclarity.net/hs-fs/hubfs/Google%20Drive%20Integration/SEO%20Split%20Testing%20vs.%20Standard%20AB%20Testing%20--%20Draft.png?width=514&name=SEO%20Split%20Testing%20vs.%20Standard%20AB%20Testing%20--%20Draft.png",
+      "imageHint": "seo split test"
+    },
+    {
+      "id": "dashboard-placeholder",
+      "description": "An image comparing keyword clustering with semantic clustering. The left side shows a simple hub-and-spoke diagram for keyword clustering. The right side shows a brain with interconnected nodes for semantic clustering, illustrating a more complex relationship between concepts.",
+      "imageUrl": "https://cdn.prod.website-files.com/64411827fb2895af9819c89b/68308c3736106341f0c22a01_keyword-clustering-vs-semantic-clustering-resized-p-800.webp",
+      "imageHint": "semantic clustering"
+    }
+  ]
+}

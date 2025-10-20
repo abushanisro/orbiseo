@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+python_backend/myenv/
+python_backend/venv/
+
+# Environment files (keep templates)
+.env*
+!.env.production.template
+!.env.example
+
+# Next.js
+.next/
+out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.coverage
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Data and models
+data/
+*.model
+*.bin
+
+# SSL certificates
+nginx/ssl/*.pem
+nginx/ssl/*.key
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup files
+*~
+*.bak
+*.tmp
+
+# Docker
+docker-compose.override.yml
