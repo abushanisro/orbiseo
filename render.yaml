@@ -10,15 +10,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: orbiseo-main-api
-          property: host
+        value: https://api.orbiseo.com
       - key: NEXT_PUBLIC_AI_CRAWL_URL
-        fromService:
-          type: web
-          name: orbiseo-crawl-api
-          property: host
+        value: https://crawl.orbiseo.com
 
   # Main API - FastAPI Backend
   - type: web
@@ -34,7 +28,7 @@ services:
       - key: LOG_LEVEL
         value: INFO
       - key: CORS_ORIGINS
-        value: '["https://orbiseo-frontend.onrender.com"]'
+        value: '["https://orbiseo.com", "https://www.orbiseo.com"]'
       # Add your Pinecone and other environment variables here
       - key: PINECONE_API_KEY
         sync: false  # You'll need to set this manually in Render dashboard
@@ -55,4 +49,4 @@ services:
       - key: LOG_LEVEL
         value: INFO
       - key: CORS_ORIGINS
-        value: '["https://orbiseo-frontend.onrender.com"]'
+        value: '["https://orbiseo.com", "https://www.orbiseo.com"]'
