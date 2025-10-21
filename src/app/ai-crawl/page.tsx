@@ -258,77 +258,77 @@ export default function AiCrawlPage() {
 
   return (
     <Suspense fallback={<ResultsSkeleton />}>
-      <div className="container mx-auto flex-1 space-y-6 sm:space-y-8 lg:space-y-12 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-12">
+      <div className="container mx-auto flex-1 space-y-4 sm:space-y-6 lg:space-y-8 px-3 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-10 max-w-7xl">
         {/* Hero Section - Responsive */}
-        <div className="text-center space-y-4 sm:space-y-6">
-          <div className="space-y-3 sm:space-y-4">
+        <div className="text-center space-y-3 sm:space-y-4">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
-              <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-black dark:text-white px-2">
                 AI Content Analyzer
               </h1>
             </div>
-            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-xl lg:max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
+            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-md lg:max-w-2xl mx-auto leading-relaxed px-4 sm:px-2">
               NLP-powered semantic analysis with gap detection and actionable insights
             </p>
           </div>
 
           {/* Export Actions - Responsive */}
           {hasResults && semanticGaps.length > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 pt-4">
-              <Button variant="outline" size="sm" onClick={exportActionableReport} className="w-full sm:w-auto">
-                <FileText className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Download Action Plan</span>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2 sm:pt-3 px-2">
+              <Button variant="outline" size="sm" onClick={exportActionableReport} className="w-full sm:w-auto text-xs sm:text-sm">
+                <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 <span className="sm:hidden">Action Plan</span>
+                <span className="hidden sm:inline">Download Action Plan</span>
               </Button>
-              <Button variant="outline" size="sm" onClick={exportGapsToJSON} className="w-full sm:w-auto">
-                <Download className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">Export Analysis</span>
+              <Button variant="outline" size="sm" onClick={exportGapsToJSON} className="w-full sm:w-auto text-xs sm:text-sm">
+                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
                 <span className="sm:hidden">Export</span>
+                <span className="hidden sm:inline">Export Analysis</span>
               </Button>
             </div>
           )}
         </div>
 
         {/* Main Content - Responsive Layout */}
-        <div className="w-full max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto space-y-6 sm:space-y-8">
+        <div className="w-full max-w-5xl mx-auto space-y-4 sm:space-y-6">
           {/* URL Input Card - Enhanced Design */}
           <Card className="shadow-lg">
             <form onSubmit={handleFormSubmit}>
-              <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
-                <CardTitle className="text-lg sm:text-xl lg:text-2xl font-semibold">Enter URL to Analyze</CardTitle>
-                <CardDescription className="text-sm sm:text-base text-muted-foreground max-w-sm sm:max-w-md mx-auto">
+              <CardHeader className="text-center pb-3 sm:pb-4 px-3 sm:px-4 lg:px-6">
+                <CardTitle className="text-base sm:text-lg lg:text-xl font-semibold">Enter URL to Analyze</CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-muted-foreground max-w-xs sm:max-w-lg mx-auto px-2 sm:px-0">
                   Get comprehensive semantic analysis with NLP gap detection and recommendations
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-4 sm:px-6 lg:px-8">
+              <CardContent className="px-3 sm:px-4 lg:px-6">
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                  <Globe className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                   <Input
                     name="url"
                     type="url"
                     placeholder="https://example.com/your-content"
                     required
                     disabled={isCrawling}
-                    className="pl-10 sm:pl-12 h-12 sm:h-14 text-sm sm:text-base"
+                    className="pl-9 sm:pl-10 lg:pl-12 h-11 sm:h-12 lg:h-14 text-sm sm:text-base"
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-center pt-4 sm:pt-6 pb-6 sm:pb-8 px-4 sm:px-6">
+              <CardFooter className="flex justify-center pt-3 sm:pt-4 pb-4 sm:pb-6 px-3 sm:px-4">
                 <Button
                   type="submit"
                   disabled={isCrawling}
                   size="default"
-                  className="w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3"
+                  className="w-full sm:w-auto px-6 sm:px-8 h-10 sm:h-11 text-sm sm:text-base"
                 >
                   {isCrawling ? (
                     <>
-                      <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 animate-pulse" />
-                      <span className="text-sm sm:text-base">Analyzing...</span>
+                      <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-pulse" />
+                      <span>Analyzing...</span>
                     </>
                   ) : (
                     <>
-                      <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
-                      <span className="text-sm sm:text-base">Analyze Content</span>
+                      <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                      <span>Analyze Content</span>
                     </>
                   )}
                 </Button>
@@ -345,31 +345,31 @@ export default function AiCrawlPage() {
 
           {/* Error States */}
           {state?.error && state.error !== 'LOGIN_REQUIRED' && (
-            <Alert variant="destructive" className="shadow-sm mx-4 sm:mx-0">
+            <Alert variant="destructive" className="shadow-sm">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle className="text-sm sm:text-base">Analysis Failed</AlertTitle>
-              <AlertDescription className="text-sm">{state.error}</AlertDescription>
+              <AlertDescription className="text-xs sm:text-sm">{state.error}</AlertDescription>
             </Alert>
           )}
 
           {state?.warning && (
-            <Alert variant="default" className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-900 shadow-sm mx-4 sm:mx-0">
+            <Alert variant="default" className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-900 shadow-sm">
               <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
               <AlertTitle className="text-yellow-900 dark:text-yellow-100 text-sm sm:text-base">Warning</AlertTitle>
-              <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">{state.warning}</AlertDescription>
+              <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-xs sm:text-sm">{state.warning}</AlertDescription>
             </Alert>
           )}
 
           {/* Results Section */}
           {hasResults && (
-            <div className="space-y-6 sm:space-y-8">
+            <div className="space-y-4 sm:space-y-6">
               {/* Metrics Overview */}
-              <div className="text-center space-y-3 sm:space-y-4 px-4 sm:px-0">
-                <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Analysis Results</h2>
-                <p className="text-sm sm:text-base text-muted-foreground">Comprehensive content analysis and recommendations</p>
+              <div className="text-center space-y-2 sm:space-y-3">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground">Analysis Results</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground px-4">Comprehensive content analysis and recommendations</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 px-4 sm:px-0">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
                 <MetricCard 
                   title="Content Quality" 
                   value={(state.content_quality_score ?? 0) * 100} 
@@ -432,38 +432,46 @@ export default function AiCrawlPage() {
               )}
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-5 h-auto">
-                  <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
-                    <Info className="h-4 w-4" />
-                    <span>Overview</span>
+                <TabsList className="grid w-full grid-cols-5 h-auto p-1">
+                  <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 py-2 px-1 sm:px-2 text-[10px] sm:text-xs lg:text-sm">
+                    <Info className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span>Over<span className="hidden xs:inline">view</span></span>
                   </TabsTrigger>
-                  <TabsTrigger value="gaps" className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm ${semanticGaps.length > 0 && highPriorityGaps > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>
-                    <AlertTriangle className="h-4 w-4" />
-                    <span className="whitespace-nowrap">Gaps ({semanticGaps.length})</span>
+                  <TabsTrigger value="gaps" className={`flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 py-2 px-1 sm:px-2 text-[10px] sm:text-xs lg:text-sm ${semanticGaps.length > 0 && highPriorityGaps > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>
+                    <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="whitespace-nowrap">
+                      <span className="hidden sm:inline">Gaps </span>({semanticGaps.length})
+                    </span>
                   </TabsTrigger>
-                  <TabsTrigger value="keywords" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
-                    <Search className="h-4 w-4" />
-                    <span className="whitespace-nowrap"><span className="hidden sm:inline">Keywords </span>({state.keywords?.length ?? 0})</span>
+                  <TabsTrigger value="keywords" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 py-2 px-1 sm:px-2 text-[10px] sm:text-xs lg:text-sm">
+                    <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="whitespace-nowrap">
+                      <span className="hidden sm:inline">Keys </span>({state.keywords?.length ?? 0})
+                    </span>
                   </TabsTrigger>
-                  <TabsTrigger value="entities" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
-                    <Building className="h-4 w-4" />
-                    <span className="whitespace-nowrap"><span className="hidden sm:inline">Entities </span>({state.entities?.length ?? 0})</span>
+                  <TabsTrigger value="entities" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 py-2 px-1 sm:px-2 text-[10px] sm:text-xs lg:text-sm">
+                    <Building className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="whitespace-nowrap">
+                      <span className="hidden sm:inline">Ent </span>({state.entities?.length ?? 0})
+                    </span>
                   </TabsTrigger>
-                  <TabsTrigger value="tags" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
-                    <Tag className="h-4 w-4" />
-                    <span className="whitespace-nowrap"><span className="hidden sm:inline">Tags </span>({state.tags?.length ?? 0})</span>
+                  <TabsTrigger value="tags" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1.5 py-2 px-1 sm:px-2 text-[10px] sm:text-xs lg:text-sm">
+                    <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <span className="whitespace-nowrap">
+                      <span className="hidden sm:inline">Tags </span>({state.tags?.length ?? 0})
+                    </span>
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="overview" className="space-y-4 mt-6">
+                <TabsContent value="overview" className="space-y-3 sm:space-y-4 mt-4 sm:mt-6">
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <FileText className="h-5 w-5 text-primary" />
+                    <CardHeader className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+                      <CardTitle className="flex items-center gap-2 text-sm sm:text-base lg:text-lg">
+                        <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                         Page Information
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-4 lg:px-6">
                       {state.title && (
                         <div>
                           <p className="text-sm text-muted-foreground">Title</p>
@@ -746,29 +754,29 @@ function MetricCard({
 
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <Icon className={`h-4 w-4 ${colorClasses[color as keyof typeof colorClasses]}`} />
-          {title}
+      <CardHeader className="pb-2 px-2 sm:px-3 lg:px-4 py-2 sm:py-3">
+        <CardTitle className="text-[10px] sm:text-xs lg:text-sm font-medium text-muted-foreground flex items-center gap-1 sm:gap-1.5">
+          <Icon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 lg:h-4 lg:w-4 ${colorClasses[color as keyof typeof colorClasses]}`} />
+          <span className="leading-tight truncate">{title}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">
+      <CardContent className="px-2 sm:px-3 lg:px-4 pb-2 sm:pb-3">
+        <div className="text-lg sm:text-xl lg:text-2xl font-bold">
           {typeof value === 'number' && value % 1 !== 0 ? value.toFixed(0) : value}{suffix}
         </div>
         {target && (
           <>
             <Progress 
               value={Math.min(percentage || 0, 100)} 
-              className="h-1.5 mt-2" 
+              className="h-1 sm:h-1.5 mt-1.5 sm:mt-2" 
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
               Target: {target}{suffix} {isGood && '✓'}
             </p>
           </>
         )}
         {severity && (
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
             {severity === 'high' ? 'Needs attention' : severity === 'medium' ? 'Monitor' : 'Looking good'}
           </p>
         )}
@@ -980,18 +988,18 @@ function ResultsSkeleton() {
 
 function EmptyState() {
   return (
-    <Card className="flex h-full min-h-[30vh] sm:min-h-[40vh] flex-col items-center justify-center p-4 sm:p-6 lg:p-8 text-center bg-card/50 border-dashed mx-4 sm:mx-0">
-      <Globe className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mb-3 sm:mb-4" />
-      <CardTitle className="text-lg sm:text-xl lg:text-2xl font-semibold">Ready to Analyze</CardTitle>
-      <CardDescription className="mt-2 max-w-sm sm:max-w-md text-sm sm:text-base px-2 sm:px-0">
+    <Card className="flex h-full min-h-[25vh] sm:min-h-[35vh] flex-col items-center justify-center p-4 sm:p-6 text-center bg-card/50 border-dashed">
+      <Globe className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 text-muted-foreground mb-2 sm:mb-3" />
+      <CardTitle className="text-base sm:text-lg lg:text-xl font-semibold px-2">Ready to Analyze</CardTitle>
+      <CardDescription className="mt-2 max-w-xs sm:max-w-md text-xs sm:text-sm px-4 sm:px-2">
         Enter any publicly accessible URL to get comprehensive semantic analysis, gap detection, and actionable optimization recommendations powered by NLP
       </CardDescription>
-      <div className="mt-4 sm:mt-6 flex flex-wrap gap-1.5 sm:gap-2 justify-center px-2 sm:px-0">
-        <Badge variant="outline" className="text-xs">Semantic Analysis</Badge>
-        <Badge variant="outline" className="text-xs">Gap Detection</Badge>
-        <Badge variant="outline" className="text-xs">SEO Optimization</Badge>
-        <Badge variant="outline" className="text-xs">Content Suggestions</Badge>
-        <Badge variant="outline" className="text-xs">Advanced NLP</Badge>
+      <div className="mt-3 sm:mt-4 flex flex-wrap gap-1 sm:gap-1.5 justify-center px-2">
+        <Badge variant="outline" className="text-[10px] sm:text-xs">Semantic Analysis</Badge>
+        <Badge variant="outline" className="text-[10px] sm:text-xs">Gap Detection</Badge>
+        <Badge variant="outline" className="text-[10px] sm:text-xs">SEO Optimization</Badge>
+        <Badge variant="outline" className="text-[10px] sm:text-xs">Content Suggestions</Badge>
+        <Badge variant="outline" className="text-[10px] sm:text-xs">Advanced NLP</Badge>
       </div>
     </Card>
   );
