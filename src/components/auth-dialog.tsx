@@ -114,9 +114,9 @@ export function AuthDialog({ open, onOpenChange, showPrompt = false }: AuthDialo
                 {showPrompt ? "Authentication Required" : "Welcome"}
             </DialogTitle>
             <DialogDescription>
-                {showPrompt 
+                {showPrompt
                     ? "Please log in or create an account to continue."
-                    : "Log in or create an account to save your history and access all features."
+                    : "Log in or create an account to access all features."
                 }
             </DialogDescription>
         </DialogHeader>

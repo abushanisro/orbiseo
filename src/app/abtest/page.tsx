@@ -40,7 +40,7 @@ export default function BlogComingSoonPage() {
           className="mt-4 max-w-2xl text-lg text-muted-foreground"
           data-variant-target="description"
         >
-          We built Semantichrefs for the SEO expert who needs clarity, not clutter. Our AI platform delivers a crystal-clear, 92/100 Content Score and pinpoints the exact technical fixes that drive traffic.
+          We built Orbiseo for the SEO expert who needs clarity, not clutter. Our AI platform delivers a crystal-clear, 92/100 Content Score and pinpoints the exact technical fixes that drive traffic.
         </p>
       </div>
     </div>

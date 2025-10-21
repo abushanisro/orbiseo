@@ -312,13 +312,13 @@ export default function DashboardPage() {
         <table className="w-full text-sm">
           <thead className="bg-slate-200 dark:bg-slate-700 sticky top-0">
             <tr>
-              <th className="p-2 text-left font-semibold border-b text-black dark:text-white">Keyword</th>
-              <th className="p-2 text-left font-semibold border-b text-black dark:text-white">Intent</th>
-              <th className="p-2 text-right font-semibold border-b text-black dark:text-white">Volume</th>
-              <th className="p-2 text-right font-semibold border-b text-black dark:text-white">KD</th>
-              <th className="p-2 text-right font-semibold border-b text-black dark:text-white">CPC</th>
-              <th className="p-2 text-right font-semibold border-b text-black dark:text-white">Score</th>
-              <th className="p-2 text-left font-semibold border-b text-black dark:text-white">Details</th>
+              <th className="p-2 text-left font-semibold border-b text-black dark:text-white whitespace-nowrap">Keyword</th>
+              <th className="p-2 text-left font-semibold border-b text-black dark:text-white whitespace-nowrap">Intent</th>
+              <th className="p-2 text-right font-semibold border-b text-black dark:text-white whitespace-nowrap">Volume</th>
+              <th className="p-2 text-right font-semibold border-b text-black dark:text-white whitespace-nowrap">KD</th>
+              <th className="p-2 text-right font-semibold border-b text-black dark:text-white whitespace-nowrap">CPC</th>
+              <th className="p-2 text-right font-semibold border-b text-black dark:text-white whitespace-nowrap">Score</th>
+              <th className="p-2 text-left font-semibold border-b text-black dark:text-white whitespace-nowrap">Details</th>
             </tr>
           </thead>
           <tbody className="text-black dark:text-white">
@@ -333,9 +333,9 @@ export default function DashboardPage() {
                 <td className="p-2">
                   <Accordion type="single" collapsible>
                     <AccordionItem value={`match-${idx}`}>
-                      <AccordionTrigger className="text-black dark:text-white">More</AccordionTrigger>
+                      <AccordionTrigger className="text-black dark:text-white py-1 text-xs sm:text-sm">More</AccordionTrigger>
                       <AccordionContent>
-                        <div className="grid grid-cols-2 gap-2 text-xs text-black dark:text-white">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-black dark:text-white">
                           <div><strong>Searcher Stage:</strong> {match.searcher_stage || '-'}</div>
                           <div><strong>Similarity:</strong> {match.semantic_similarity || 0}</div>
                           <div><strong>Cluster:</strong> {match.semantic_cluster || '-'}</div>
@@ -356,42 +356,54 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-black dark:text-white">OrbiSEO Semantic SEO Dashboard</h1>
-        <p className="text-muted-foreground text-gray-600 dark:text-gray-400">
-          AI-powered keyword research with SERP data
+    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
+      <div className="space-y-2 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white">OrbiSEO Dashboard</h1>
+        <p className="text-sm sm:text-base text-muted-foreground text-gray-600 dark:text-gray-400">
+          AI-powered keyword research with SERP
         </p>
       </div>
 
       <Tabs defaultValue="search" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 max-w-2xl">
-          <TabsTrigger value="search">Semantic Search</TabsTrigger>
-          <TabsTrigger value="expand">Keyword Expansion</TabsTrigger>
-          <TabsTrigger value="serp">SERP Analysis</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto">
+          <TabsTrigger value="search" className="text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2">
+            <Search className="w-4 h-4" />
+            <span className="hidden sm:inline">Semantic Search</span>
+            <span className="sm:hidden">Search</span>
+          </TabsTrigger>
+          <TabsTrigger value="expand" className="text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2">
+            <Sparkles className="w-4 h-4" />
+            <span className="hidden sm:inline">Keyword Expansion</span>
+            <span className="sm:hidden">Expand</span>
+          </TabsTrigger>
+          <TabsTrigger value="serp" className="text-xs sm:text-sm flex items-center justify-center gap-1 sm:gap-2">
+            <Globe className="w-4 h-4" />
+            <span className="hidden sm:inline">SERP Analysis</span>
+            <span className="sm:hidden">SERP</span>
+          </TabsTrigger>
         </TabsList>
 
         {/* SEMANTIC SEARCH TAB */}
-        <TabsContent value="search" className="space-y-6">
+        <TabsContent value="search" className="space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+              <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                 <Search className="w-5 h-5" />
                 Semantic Keyword Search
               </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-400">
+              <CardDescription className="text-gray-600 dark:text-gray-400 text-sm">
                 Find semantically related keywords
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSemanticSearch} className="flex gap-4">
+              <form onSubmit={handleSemanticSearch} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Enter a keyword or phrase..."
                   className="flex-1"
                 />
-                <Button type="submit" disabled={isSearching}>
+                <Button type="submit" disabled={isSearching} className="w-full sm:w-auto">
                   {isSearching ? "Searching..." : "Search"}
                 </Button>
               </form>
@@ -404,14 +416,14 @@ export default function DashboardPage() {
               {searchResults.intent && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                    <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                       <Brain className="w-5 h-5" />
                       Query Intent
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-4">
-                      <Badge className="text-lg px-4 py-2 text-black dark:text-white">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <Badge className="text-base sm:text-lg px-4 py-2 text-black dark:text-white">
                         {searchResults.intent}
                       </Badge>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -426,36 +438,36 @@ export default function DashboardPage() {
               {searchResults.aggregate_metrics && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                    <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                       <BarChart3 className="w-5 h-5" />
                       Aggregate Metrics
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <div className="text-2xl font-bold text-black dark:text-white">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                      <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                        <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                           {searchResults.aggregate_metrics.total_search_volume.toLocaleString()}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Volume</div>
+                        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Total Volume</div>
                       </div>
-                      <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <div className="text-2xl font-bold text-black dark:text-white">
+                      <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                        <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                           {searchResults.aggregate_metrics.avg_keyword_difficulty.toFixed(1)}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Avg KD</div>
+                        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg KD</div>
                       </div>
-                      <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <div className="text-2xl font-bold text-black dark:text-white">
+                      <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                        <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                           ${searchResults.aggregate_metrics.avg_cpc.toFixed(2)}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">Avg CPC</div>
+                        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg CPC</div>
                       </div>
-                      <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <div className="text-2xl font-bold text-black dark:text-white">
+                      <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                        <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                           {searchResults.aggregate_metrics.high_volume_count}
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">High Volume</div>
+                        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">High Volume</div>
                       </div>
                     </div>
                   </CardContent>
@@ -464,8 +476,8 @@ export default function DashboardPage() {
 
               {/* Matches Table */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-black dark:text-white">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+                  <CardTitle className="text-black dark:text-white text-lg sm:text-xl">
                     Top Matches ({searchResults.matches?.length || 0})
                   </CardTitle>
                   {searchResults.matches?.length > 0 && (
@@ -473,6 +485,7 @@ export default function DashboardPage() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => exportToCSV(searchResults.matches, `semantic-matches-${searchQuery}.csv`)}
+                      className="w-full sm:w-auto"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Export
@@ -497,7 +510,7 @@ export default function DashboardPage() {
               {searchResults.clusters && Object.keys(searchResults.clusters).length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                    <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                       <Layers className="w-5 h-5" />
                       Topic Clusters
                     </CardTitle>
@@ -509,7 +522,7 @@ export default function DashboardPage() {
                           <h3 className="font-semibold mb-2 text-black dark:text-white">{name}</h3>
                           <div className="flex flex-wrap gap-2">
                             {keywords.slice(0, 10).map((kw, i) => (
-                              <Badge key={i} variant="outline" className="text-black dark:text-white">
+                              <Badge key={i} variant="outline" className="text-black dark:text-white text-xs sm:text-sm">
                                 {kw}
                               </Badge>
                             ))}
@@ -525,26 +538,26 @@ export default function DashboardPage() {
         </TabsContent>
 
         {/* KEYWORD EXPANSION TAB */}
-        <TabsContent value="expand" className="space-y-6">
+        <TabsContent value="expand" className="space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+              <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                 <Sparkles className="w-5 h-5" />
                 Keyword Expansion
               </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-400">
+              <CardDescription className="text-gray-600 dark:text-gray-400 text-sm">
                 Generate hundreds of related keywords with metrics
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleKeywordExpansion} className="flex gap-4">
+              <form onSubmit={handleKeywordExpansion} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Input
                   value={expandQuery}
                   onChange={(e) => setExpandQuery(e.target.value)}
                   placeholder="Enter seed keyword..."
                   className="flex-1"
                 />
-                <Button type="submit" disabled={isExpanding}>
+                <Button type="submit" disabled={isExpanding} className="w-full sm:w-auto">
                   {isExpanding ? "Expanding..." : "Expand"}
                 </Button>
               </form>
@@ -556,36 +569,36 @@ export default function DashboardPage() {
               {/* Metrics Summary */}
               <Card className="bg-slate-50 dark:bg-slate-800">
                 <CardHeader className="bg-slate-100 dark:bg-slate-700">
-                  <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                  <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                     <BarChart3 className="w-5 h-5" />
                     Metrics Summary
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 bg-white dark:bg-slate-900 rounded-lg">
-                      <div className="text-2xl font-bold text-black dark:text-white">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-lg text-center">
+                      <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                         {expandResults.metrics_summary.total_search_volume.toLocaleString()}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Total Volume</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Total Volume</div>
                     </div>
-                    <div className="p-4 bg-white dark:bg-slate-900 rounded-lg">
-                      <div className="text-2xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-lg text-center">
+                      <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                         {expandResults.metrics_summary.avg_competition.toFixed(2)}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Avg Competition</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg Competition</div>
                     </div>
-                    <div className="p-4 bg-white dark:bg-slate-900 rounded-lg">
-                      <div className="text-2xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-lg text-center">
+                      <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                         ${expandResults.metrics_summary.avg_cpc.toFixed(2)}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Avg CPC</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Avg CPC</div>
                     </div>
-                    <div className="p-4 bg-white dark:bg-slate-900 rounded-lg">
-                      <div className="text-2xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-lg text-center">
+                      <div className="text-xl sm:text-2xl font-bold text-black dark:text-white">
                         {expandResults.metrics_summary.high_volume_keywords}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">High Volume KWs</div>
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">High Volume KWs</div>
                     </div>
                   </div>
                 </CardContent>
@@ -593,8 +606,8 @@ export default function DashboardPage() {
 
               {/* Keywords Table */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-black dark:text-white">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+                  <CardTitle className="text-black dark:text-white text-lg sm:text-xl">
                     Expanded Keywords ({expandResults.total_keywords})
                   </CardTitle>
                   {expandResults.expanded_keywords?.length > 0 && (
@@ -602,6 +615,7 @@ export default function DashboardPage() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => exportToCSV(expandResults.expanded_keywords, `expansion-${expandQuery}.csv`)}
+                      className="w-full sm:w-auto"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Export
@@ -626,26 +640,26 @@ export default function DashboardPage() {
         </TabsContent>
 
         {/* SERP ANALYSIS TAB */}
-        <TabsContent value="serp" className="space-y-6">
+        <TabsContent value="serp" className="space-y-4 sm:space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+              <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                 <Globe className="w-5 h-5" />
                 SERP Analysis
               </CardTitle>
-              <CardDescription className="text-gray-600 dark:text-gray-400">
+              <CardDescription className="text-gray-600 dark:text-gray-400 text-sm">
                 Analyze search results and find content opportunities
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSERPAnalysis} className="flex gap-4">
+              <form onSubmit={handleSERPAnalysis} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <Input
                   value={serpKeyword}
                   onChange={(e) => setSerpKeyword(e.target.value)}
                   placeholder="Enter keyword to analyze..."
                   className="flex-1"
                 />
-                <Button type="submit" disabled={isAnalyzingSERP}>
+                <Button type="submit" disabled={isAnalyzingSERP} className="w-full sm:w-auto">
                   {isAnalyzingSERP ? "Analyzing..." : "Analyze"}
                 </Button>
               </form>
@@ -657,46 +671,46 @@ export default function DashboardPage() {
               {/* Intent & Metrics */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                  <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                     <Target className="w-5 h-5" />
                     Search Intent & SERP Metrics
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Intent</div>
-                      <div className="text-xl font-bold text-black dark:text-white capitalize mt-2">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                    <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Intent</div>
+                      <div className="text-lg sm:text-xl font-bold text-black dark:text-white capitalize mt-2">
                         {serpResults.intent}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         {(serpResults.intent_confidence * 100).toFixed(0)}% confidence
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Avg DA</div>
-                      <div className="text-xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Avg DA</div>
+                      <div className="text-lg sm:text-xl font-bold text-black dark:text-white">
                         {serpResults.serp_metrics.avg_domain_authority.toFixed(0)}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         {serpResults.serp_metrics.competition_level}
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Avg KD</div>
-                      <div className="text-xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Avg KD</div>
+                      <div className="text-lg sm:text-xl font-bold text-black dark:text-white">
                         {serpResults.serp_metrics.avg_keyword_difficulty.toFixed(0)}
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Total Traffic</div>
-                      <div className="text-xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Total Traffic</div>
+                      <div className="text-lg sm:text-xl font-bold text-black dark:text-white">
                         {serpResults.serp_metrics.total_competitor_traffic.toLocaleString()}
                       </div>
                     </div>
-                    <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Diversity</div>
-                      <div className="text-xl font-bold text-black dark:text-white">
+                    <div className="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+                      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Diversity</div>
+                      <div className="text-lg sm:text-xl font-bold text-black dark:text-white">
                         {serpResults.serp_metrics.serp_diversity}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">unique domains</div>
@@ -707,8 +721,8 @@ export default function DashboardPage() {
 
               {/* Organic Results */}
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-black dark:text-white">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+                  <CardTitle className="text-black dark:text-white text-lg sm:text-xl">
                     Top Organic Results ({serpResults.total_organic_results})
                   </CardTitle>
                   {serpResults.organic_results?.length > 0 && (
@@ -716,6 +730,7 @@ export default function DashboardPage() {
                       variant="outline" 
                       size="sm" 
                       onClick={() => exportToCSV(serpResults.organic_results, `serp-${serpKeyword}.csv`)}
+                      className="w-full sm:w-auto"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Export
@@ -727,11 +742,11 @@ export default function DashboardPage() {
                     serpResults.organic_results.slice(0, 20).map((result, idx) => (
                       <div 
                         key={idx} 
-                        className="p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        className="p-3 sm:p-4 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
                               <Badge className="text-black dark:text-white">#{result.position}</Badge>
                               <span className="text-xs text-gray-500 dark:text-gray-400">
                                 DA: {result.domain_authority}
@@ -749,14 +764,14 @@ export default function DashboardPage() {
                               href={result.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-semibold text-blue-600 dark:text-blue-400 hover:underline block mb-1"
+                              className="font-semibold text-sm sm:text-base text-blue-600 dark:text-blue-400 hover:underline block mb-1 break-words"
                             >
                               {result.title}
                             </a>
-                            <div className="text-sm text-green-600 dark:text-green-400 mb-2">
+                            <div className="text-xs sm:text-sm text-green-600 dark:text-green-400 mb-2 break-all">
                               {result.domain}
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                               {result.description}
                             </p>
                           </div>
@@ -776,7 +791,7 @@ export default function DashboardPage() {
               {serpResults.content_opportunities && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                    <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                       <TrendingUp className="w-5 h-5" />
                       Content Opportunities
                     </CardTitle>
@@ -785,13 +800,13 @@ export default function DashboardPage() {
                     <Accordion type="single" collapsible className="w-full">
                       {serpResults.content_opportunities.high_volume_keywords?.length > 0 && (
                         <AccordionItem value="high-volume">
-                          <AccordionTrigger className="text-black dark:text-white">
+                          <AccordionTrigger className="text-black dark:text-white text-sm sm:text-base">
                             High Volume Keywords ({serpResults.content_opportunities.high_volume_keywords.length})
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="flex flex-wrap gap-2">
                               {serpResults.content_opportunities.high_volume_keywords.map((kw, i) => (
-                                <Badge key={i} variant="secondary" className="text-black dark:text-white">
+                                <Badge key={i} variant="secondary" className="text-black dark:text-white text-xs sm:text-sm">
                                   {kw}
                                 </Badge>
                               ))}
@@ -802,13 +817,13 @@ export default function DashboardPage() {
 
                       {serpResults.content_opportunities.low_competition_keywords?.length > 0 && (
                         <AccordionItem value="low-competition">
-                          <AccordionTrigger className="text-black dark:text-white">
+                          <AccordionTrigger className="text-black dark:text-white text-sm sm:text-base">
                             Low Competition Keywords ({serpResults.content_opportunities.low_competition_keywords.length})
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="flex flex-wrap gap-2">
                               {serpResults.content_opportunities.low_competition_keywords.map((kw, i) => (
-                                <Badge key={i} variant="outline" className="text-black dark:text-white">
+                                <Badge key={i} variant="outline" className="text-black dark:text-white text-xs sm:text-sm">
                                   {kw}
                                 </Badge>
                               ))}
@@ -819,14 +834,14 @@ export default function DashboardPage() {
 
                       {serpResults.content_opportunities.semantic_clusters?.length > 0 && (
                         <AccordionItem value="clusters">
-                          <AccordionTrigger className="text-black dark:text-white">
+                          <AccordionTrigger className="text-black dark:text-white text-sm sm:text-base">
                             Semantic Clusters ({serpResults.content_opportunities.semantic_clusters.length})
                           </AccordionTrigger>
                           <AccordionContent>
                             <div className="flex flex-wrap gap-2">
                               {serpResults.content_opportunities.semantic_clusters.map((cluster, i) => (
                                 cluster && (
-                                  <Badge key={i} className="text-black dark:text-white">
+                                  <Badge key={i} className="text-black dark:text-white text-xs sm:text-sm">
                                     {cluster}
                                   </Badge>
                                 )
@@ -837,7 +852,7 @@ export default function DashboardPage() {
                       )}
                     </Accordion>
 
-                    <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-950 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                    <div className="mt-4 p-3 sm:p-4 bg-indigo-50 dark:bg-indigo-950 rounded-lg border border-indigo-200 dark:border-indigo-800 text-center">
                       <div className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
                         Total Opportunity Score: {serpResults.content_opportunities.total_opportunity_score}
                       </div>
@@ -850,7 +865,7 @@ export default function DashboardPage() {
               {serpResults.related_searches?.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                    <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                       <Layers className="w-5 h-5" />
                       Related Searches
                     </CardTitle>
@@ -861,12 +876,12 @@ export default function DashboardPage() {
                         <Badge 
                           key={idx} 
                           variant="secondary" 
-                          className="hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer text-black dark:text-white"
+                          className="hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer text-black dark:text-white text-xs sm:text-sm"
                           onClick={() => {
                             setSerpKeyword(term);
-                            // Trigger analysis with new keyword
                             setTimeout(() => {
-                              document.querySelector<HTMLFormElement>('form')?.requestSubmit();
+                              const form = document.querySelector('form');
+                              if (form) form.requestSubmit();
                             }, 100);
                           }}
                         >
@@ -882,7 +897,7 @@ export default function DashboardPage() {
               {serpResults.ai_recommendations?.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-black dark:text-white">
+                    <CardTitle className="flex items-center gap-2 text-black dark:text-white text-lg sm:text-xl">
                       <Lightbulb className="w-5 h-5" />
                       AI Recommendations
                     </CardTitle>
@@ -894,10 +909,10 @@ export default function DashboardPage() {
                           key={idx} 
                           className="flex gap-3 hover:bg-slate-50 dark:hover:bg-slate-800 p-3 rounded transition-colors"
                         >
-                          <div className="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-semibold text-sm flex-shrink-0">
+                          <div className="w-6 h-6 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-semibold text-xs sm:text-sm flex-shrink-0">
                             {idx + 1}
                           </div>
-                          <p className="text-sm text-black dark:text-white">{rec}</p>
+                          <p className="text-xs sm:text-sm text-black dark:text-white">{rec}</p>
                         </li>
                       ))}
                     </ul>

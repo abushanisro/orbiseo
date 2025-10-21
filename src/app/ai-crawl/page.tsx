@@ -258,62 +258,77 @@ export default function AiCrawlPage() {
 
   return (
     <Suspense fallback={<ResultsSkeleton />}>
-      <div className="container mx-auto flex-1 space-y-8 p-4 pt-6 md:p-8">
-        <div className="flex flex-col items-start justify-between space-y-2">
-          <div className="flex items-center justify-between w-full">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                <Globe className="h-7 w-7" />
+      <div className="container mx-auto flex-1 space-y-6 sm:space-y-8 lg:space-y-12 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-12">
+        {/* Hero Section - Responsive */}
+        <div className="text-center space-y-4 sm:space-y-6">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-black dark:text-white">
                 AI Content Analyzer
               </h1>
-              <p className="text-muted-foreground">
-                NLP-powered semantic analysis with gap detection
-              </p>
             </div>
-            {hasResults && semanticGaps.length > 0 && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={exportActionableReport}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Action Plan
-                </Button>
-                <Button variant="outline" size="sm" onClick={exportGapsToJSON}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export JSON
-                </Button>
-              </div>
-            )}
+            <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-xl lg:max-w-2xl mx-auto leading-relaxed px-4 sm:px-0">
+              NLP-powered semantic analysis with gap detection and actionable insights
+            </p>
           </div>
+
+          {/* Export Actions - Responsive */}
+          {hasResults && semanticGaps.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 pt-4">
+              <Button variant="outline" size="sm" onClick={exportActionableReport} className="w-full sm:w-auto">
+                <FileText className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Download Action Plan</span>
+                <span className="sm:hidden">Action Plan</span>
+              </Button>
+              <Button variant="outline" size="sm" onClick={exportGapsToJSON} className="w-full sm:w-auto">
+                <Download className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Export Analysis</span>
+                <span className="sm:hidden">Export</span>
+              </Button>
+            </div>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 gap-8">
-          <Card>
+        {/* Main Content - Responsive Layout */}
+        <div className="w-full max-w-xs sm:max-w-2xl lg:max-w-4xl mx-auto space-y-6 sm:space-y-8">
+          {/* URL Input Card - Enhanced Design */}
+          <Card className="shadow-lg">
             <form onSubmit={handleFormSubmit}>
-              <CardHeader>
-                <CardTitle>Enter URL to Analyze</CardTitle>
-                <CardDescription>
-                  Get comprehensive semantic analysis with NLP, gap detection recommendations
+              <CardHeader className="text-center pb-4 sm:pb-6 px-4 sm:px-6">
+                <CardTitle className="text-lg sm:text-xl lg:text-2xl font-semibold">Enter URL to Analyze</CardTitle>
+                <CardDescription className="text-sm sm:text-base text-muted-foreground max-w-sm sm:max-w-md mx-auto">
+                  Get comprehensive semantic analysis with NLP gap detection and recommendations
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Input
-                  name="url"
-                  type="url"
-                  placeholder="https://orbiseo.com/article"
-                  required
-                  disabled={isCrawling}
-                />
+              <CardContent className="px-4 sm:px-6 lg:px-8">
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
+                  <Input
+                    name="url"
+                    type="url"
+                    placeholder="https://example.com/your-content"
+                    required
+                    disabled={isCrawling}
+                    className="pl-10 sm:pl-12 h-12 sm:h-14 text-sm sm:text-base"
+                  />
+                </div>
               </CardContent>
-              <CardFooter>
-                <Button type="submit" disabled={isCrawling}>
+              <CardFooter className="flex justify-center pt-4 sm:pt-6 pb-6 sm:pb-8 px-4 sm:px-6">
+                <Button
+                  type="submit"
+                  disabled={isCrawling}
+                  size="default"
+                  className="w-full sm:w-auto px-6 sm:px-8 py-2 sm:py-3"
+                >
                   {isCrawling ? (
                     <>
-                      <Zap className="h-4 w-4 mr-2 animate-pulse" />
-                      Analyzing with Advanced NLP...
+                      <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 animate-pulse" />
+                      <span className="text-sm sm:text-base">Analyzing...</span>
                     </>
                   ) : (
                     <>
-                      <Search className="h-4 w-4 mr-2" />
-                      Analyze Content
+                      <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3" />
+                      <span className="text-sm sm:text-base">Analyze Content</span>
                     </>
                   )}
                 </Button>
@@ -321,27 +336,40 @@ export default function AiCrawlPage() {
             </form>
           </Card>
 
-          {isCrawling && <ResultsSkeleton />}
+          {/* Loading State */}
+          {isCrawling && (
+            <Card className="shadow-lg border-0">
+              <ResultsSkeleton />
+            </Card>
+          )}
 
+          {/* Error States */}
           {state?.error && state.error !== 'LOGIN_REQUIRED' && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="shadow-sm mx-4 sm:mx-0">
               <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Analysis Failed</AlertTitle>
-              <AlertDescription>{state.error}</AlertDescription>
+              <AlertTitle className="text-sm sm:text-base">Analysis Failed</AlertTitle>
+              <AlertDescription className="text-sm">{state.error}</AlertDescription>
             </Alert>
           )}
 
           {state?.warning && (
-            <Alert variant="default" className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-900">
+            <Alert variant="default" className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950 dark:border-yellow-900 shadow-sm mx-4 sm:mx-0">
               <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              <AlertTitle className="text-yellow-900 dark:text-yellow-100">Warning</AlertTitle>
-              <AlertDescription className="text-yellow-800 dark:text-yellow-200">{state.warning}</AlertDescription>
+              <AlertTitle className="text-yellow-900 dark:text-yellow-100 text-sm sm:text-base">Warning</AlertTitle>
+              <AlertDescription className="text-yellow-800 dark:text-yellow-200 text-sm">{state.warning}</AlertDescription>
             </Alert>
           )}
 
+          {/* Results Section */}
           {hasResults && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-6 sm:space-y-8">
+              {/* Metrics Overview */}
+              <div className="text-center space-y-3 sm:space-y-4 px-4 sm:px-0">
+                <h2 className="text-xl sm:text-2xl font-semibold text-foreground">Analysis Results</h2>
+                <p className="text-sm sm:text-base text-muted-foreground">Comprehensive content analysis and recommendations</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 px-4 sm:px-0">
                 <MetricCard 
                   title="Content Quality" 
                   value={(state.content_quality_score ?? 0) * 100} 
@@ -404,26 +432,26 @@ export default function AiCrawlPage() {
               )}
 
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="overview">
-                    <Info className="h-4 w-4 mr-2" />
-                    Overview
+                <TabsList className="grid w-full grid-cols-5 h-auto">
+                  <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
+                    <Info className="h-4 w-4" />
+                    <span>Overview</span>
                   </TabsTrigger>
-                  <TabsTrigger value="gaps" className={semanticGaps.length > 0 && highPriorityGaps > 0 ? 'text-red-600 dark:text-red-400' : ''}>
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    Gaps ({semanticGaps.length})
+                  <TabsTrigger value="gaps" className={`flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm ${semanticGaps.length > 0 && highPriorityGaps > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="whitespace-nowrap">Gaps ({semanticGaps.length})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="keywords">
-                    <Search className="h-4 w-4 mr-2" />
-                    Keywords ({state.keywords?.length ?? 0})
+                  <TabsTrigger value="keywords" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
+                    <Search className="h-4 w-4" />
+                    <span className="whitespace-nowrap"><span className="hidden sm:inline">Keywords </span>({state.keywords?.length ?? 0})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="entities">
-                    <Building className="h-4 w-4 mr-2" />
-                    Entities ({state.entities?.length ?? 0})
+                  <TabsTrigger value="entities" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
+                    <Building className="h-4 w-4" />
+                    <span className="whitespace-nowrap"><span className="hidden sm:inline">Entities </span>({state.entities?.length ?? 0})</span>
                   </TabsTrigger>
-                  <TabsTrigger value="tags">
-                    <Tag className="h-4 w-4 mr-2" />
-                    Tags ({state.tags?.length ?? 0})
+                  <TabsTrigger value="tags" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-2 text-xs sm:text-sm">
+                    <Tag className="h-4 w-4" />
+                    <span className="whitespace-nowrap"><span className="hidden sm:inline">Tags </span>({state.tags?.length ?? 0})</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -816,7 +844,7 @@ function GapAnalysisSection({
                     <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0 dark:text-green-400" />
                     <div className="flex-1">
                       <h4 className="font-semibold text-sm mb-2 text-green-900 dark:text-green-100">
-                        ✓ Recommended Solution
+                        Recommended Solution
                       </h4>
                       <p className="text-sm text-gray-800 leading-relaxed dark:text-gray-200">{gap.solution}</p>
                     </div>
@@ -881,7 +909,7 @@ function GapAnalysisSection({
 
 function ResultsSkeleton() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
           <Card key={i}>
@@ -952,13 +980,13 @@ function ResultsSkeleton() {
 
 function EmptyState() {
   return (
-    <Card className="flex h-full min-h-[40vh] flex-col items-center justify-center p-8 text-center bg-card/50 border-dashed">
-      <Globe className="h-16 w-16 text-muted-foreground mb-4" />
-      <CardTitle className="text-2xl font-semibold">Ready to Analyze</CardTitle>
-      <CardDescription className="mt-2 max-w-md text-base">
-        Enter any publicly accessible URL to get comprehensive semantic analysis, gap detection, and actionable optimization recommendations powered by advanced NLP.
+    <Card className="flex h-full min-h-[30vh] sm:min-h-[40vh] flex-col items-center justify-center p-4 sm:p-6 lg:p-8 text-center bg-card/50 border-dashed mx-4 sm:mx-0">
+      <Globe className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mb-3 sm:mb-4" />
+      <CardTitle className="text-lg sm:text-xl lg:text-2xl font-semibold">Ready to Analyze</CardTitle>
+      <CardDescription className="mt-2 max-w-sm sm:max-w-md text-sm sm:text-base px-2 sm:px-0">
+        Enter any publicly accessible URL to get comprehensive semantic analysis, gap detection, and actionable optimization recommendations powered by NLP
       </CardDescription>
-      <div className="mt-6 flex flex-wrap gap-2 justify-center">
+      <div className="mt-4 sm:mt-6 flex flex-wrap gap-1.5 sm:gap-2 justify-center px-2 sm:px-0">
         <Badge variant="outline" className="text-xs">Semantic Analysis</Badge>
         <Badge variant="outline" className="text-xs">Gap Detection</Badge>
         <Badge variant="outline" className="text-xs">SEO Optimization</Badge>

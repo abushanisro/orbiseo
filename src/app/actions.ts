@@ -92,27 +92,7 @@ export type CrawlState = {
   warning?: string;
 } | null;
 
-export type KeywordAnalysis = {
-  id: string;
-  user_id: string;
-  keywords: string[];
-  clusters: Record<string, string[]>;
-  suggestions: string[];
-  created_at: Date;
-};
 
-export type SearchQuery = {
-  id: string;
-  query: string;
-  user_id: string;
-  created_at: Date;
-};
-
-export type HistoryState = {
-  analyses?: KeywordAnalysis[];
-  searchHistory?: SearchQuery[];
-  error?: string;
-};
 
 export type PineconeSearchState = {
   query?: string;
@@ -234,23 +214,6 @@ const AI_CRAWL_URL = process.env.AI_CRAWL_URL || 'http://localhost:8001';
 // DATABASE HELPER FUNCTIONS
 // ============================================================================
 
-/**
- * Save a search query to the database
- */
-async function saveSearch(userId: string, query: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    // TODO: Implement database save logic
-    // This is a placeholder - replace with your actual database call
-    // Example using Supabase, Prisma, or any other DB client:
-    // await db.searches.create({ user_id: userId, query, created_at: new Date() });
-    
-    console.log(`[DB] Saving search - User: ${userId}, Query: ${query}`);
-    return { success: true };
-  } catch (error: any) {
-    console.error('[DB] Error saving search:', error);
-    return { success: false, error: error.message };
-  }
-}
 
 /**
  * Save keyword analysis results to the database
@@ -286,47 +249,7 @@ async function saveAnalysis(
   }
 }
 
-/**
- * Retrieve analysis history for a user
- */
-export async function getAnalysisHistory(userId: string): Promise<KeywordAnalysis[]> {
-  try {
-    // TODO: Implement database retrieval logic
-    // Example:
-    // const rows = await db.analyses.findMany({
-    //   where: { user_id: userId },
-    //   orderBy: { created_at: 'desc' },
-    //   limit: 50
-    // });
-    
-    console.log(`[DB] Fetching analysis history for user: ${userId}`);
-    return [];
-  } catch (error) {
-    console.error('[DB] Error fetching analysis history:', error);
-    return [];
-  }
-}
 
-/**
- * Retrieve search history for a user
- */
-export async function getSearchHistory(userId: string): Promise<SearchQuery[]> {
-  try {
-    // TODO: Implement database retrieval logic
-    // Example:
-    // const rows = await db.searches.findMany({
-    //   where: { user_id: userId },
-    //   orderBy: { created_at: 'desc' },
-    //   limit: 100
-    // });
-    
-    console.log(`[DB] Fetching search history for user: ${userId}`);
-    return [];
-  } catch (error) {
-    console.error('[DB] Error fetching search history:', error);
-    return [];
-  }
-}
 
 // ============================================================================
 // AI CRAWL URL ACTION
@@ -467,8 +390,6 @@ export async function searchSimilarKeywords(
   }
 
   try {
-    // Save search to history
-    await saveSearch(uid, query);
 
     const response = await fetch(`${API_URL}/api/semantic-search-live`, {
       method: 'POST',
@@ -515,8 +436,6 @@ export async function performEnhancedSearch(
   }
 
   try {
-    // Save search to history
-    await saveSearch(uid, query);
 
     const response = await fetch(`${API_URL}/api/semantic-search-live`, {
       method: 'POST',
@@ -566,8 +485,6 @@ export async function pineconeSemanticSearch(
   }
 
   try {
-    // Save search to history
-    await saveSearch(uid, query);
 
     const response = await fetch(`${API_URL}/api/semantic-search-live`, {
       method: 'POST',

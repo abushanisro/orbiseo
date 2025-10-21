@@ -66,19 +66,6 @@ export function DashboardForms({ onAnalyze, isAnalyzing, setLoginPromptOpen }: D
           title: "Search Failed",
           description: result.error,
         });
-      } else if (!result?.error) {
-        // Save to history on successful search
-        const historyCollection = collection(firestore as Firestore, 'users', user.uid, 'search_history');
-        try {
-          await addDoc(historyCollection, {
-              query: query,
-              timestamp: serverTimestamp(),
-              userId: user.uid,
-          });
-        } catch (historyError: any) {
-          // Log history error but don't block the user from seeing results
-          console.error("Failed to save search history:", historyError);
-        }
       }
       setSearchState(result);
     });
@@ -113,8 +100,8 @@ export function DashboardForms({ onAnalyze, isAnalyzing, setLoginPromptOpen }: D
                 disabled={isSearching}
             />
             </CardContent>
-            <CardFooter>
-            <Button type="submit" disabled={isSearching} variant="secondary" className="w-full">
+            <CardFooter className="flex justify-center">
+            <Button type="submit" disabled={isSearching} variant="secondary">
                 {isSearching ? "Searching..." : "Find Similar Keywords"}
             </Button>
             </CardFooter>
@@ -138,9 +125,9 @@ export function DashboardForms({ onAnalyze, isAnalyzing, setLoginPromptOpen }: D
             <Textarea
                 name="keywords"
                 placeholder="e.g.
-best electric car in India
-affordable EVs for city driving
-Tesla competitors in India"
+best crypto to buy in India
+affordable crypto
+Bitcoin competitors in India"
                 className="min-h-48 resize-y"
                 required
                 value={keywords}
@@ -148,8 +135,8 @@ Tesla competitors in India"
                 disabled={isAnalyzing}
             />
             </CardContent>
-            <CardFooter>
-            <Button type="submit" disabled={isAnalyzing} className="w-full">
+            <CardFooter className="flex justify-center">
+            <Button type="submit" disabled={isAnalyzing}>
                 {isAnalyzing ? "Analyzing..." : "Analyze Keywords"}
                 <Sparkles className="ml-2 h-4 w-4" />
             </Button>
