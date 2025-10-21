@@ -11,10 +11,10 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between py-6">
           <div className="flex items-center gap-2">
             <Logo className="h-10 w-10" />
-            <span className="font-bold text-lg">Semantichrefs</span>
+            <span className="font-bold text-lg">OrbiSEO</span>
           </div>
           <p className="text-muted-foreground text-sm mt-4 md:mt-0">
-            © 2025 Semantichrefs. All rights reserved.
+            © 2025 OrbiSEO. All rights reserved.
           </p>
           <div className="flex items-center gap-2 mt-4 md:mt-0">
             <a

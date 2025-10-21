@@ -3,7 +3,7 @@
 // Ensure environment variable is logged for debugging
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-console.log('[DEBUG] API Configuration Initialized:', {
+console.log('🔧 [DEBUG] API Configuration Initialized:', {
   API_BASE_URL,
   NODE_ENV: process.env.NODE_ENV,
   timestamp: new Date().toISOString(),
@@ -126,15 +126,15 @@ async function debugFetch<T>(endpoint: string, options: RequestInit = {}): Promi
       console.warn('⏳ [DEBUG] Abort Error:', errorInfo);
     } else if (err.name === 'TypeError' && err.message.includes('Failed to fetch')) {
       errorInfo.message = 'Network error - Check backend, CORS, or connectivity';
-      console.error('[DEBUG] Network/Type Error:', errorInfo);
-      console.info('[DEBUG] Troubleshooting Tips:', [
+      console.error('🌐 [DEBUG] Network/Type Error:', errorInfo);
+      console.info('💡 [DEBUG] Troubleshooting Tips:', [
         '1. Is the backend running? Try curl http://localhost:8000/health',
         '2. Check browser console for CORS errors',
         '3. Verify NEXT_PUBLIC_API_URL in .env.local',
         '4. Ensure backend allows CORS for your origin',
       ]);
     } else {
-      console.error('[DEBUG] Unexpected Fetch Exception:', errorInfo);
+      console.error('🔥 [DEBUG] Unexpected Fetch Exception:', errorInfo);
     }
 
     if (error instanceof BackendAPIError) {
@@ -155,6 +155,7 @@ async function debugFetch<T>(endpoint: string, options: RequestInit = {}): Promi
 export const backendAPI = {
   /**
    * Semantic keyword search with debug logs
+   * FIXED: Removed /api prefix from endpoint
    */
   async semanticSearch(params: {
     query: string;
@@ -182,6 +183,7 @@ export const backendAPI = {
       languageCode: params.languageCode || 'en',
     });
 
+    // FIXED: Backend uses /api prefix
     return debugFetch('/api/semantic-search-live', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -191,6 +193,7 @@ export const backendAPI = {
 
   /**
    * Keyword expansion with debug logs
+   * FIXED: Removed /api prefix from endpoint
    */
   async expandKeywords(params: {
     seed_keyword: string;
@@ -201,7 +204,7 @@ export const backendAPI = {
     locationCode?: number;
     languageCode?: string;
   }) {
-    console.log('[DEBUG] expandKeywords Method Called:', {
+    console.log('📈 [DEBUG] expandKeywords Method Called:', {
       params,
       timestamp: new Date().toISOString(),
     });
@@ -216,6 +219,7 @@ export const backendAPI = {
       languageCode: params.languageCode || 'en',
     });
 
+    // FIXED: Backend uses /api prefix
     return debugFetch('/api/expand-keywords', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -225,13 +229,14 @@ export const backendAPI = {
 
   /**
    * SERP analysis with debug logs
+   * FIXED: Removed /api prefix from endpoint
    */
   async serpAnalysis(params: {
     keyword: string;
     locationCode?: number;
     languageCode?: string;
   }) {
-    console.log('[DEBUG] serpAnalysis Method Called:', {
+    console.log('🌐 [DEBUG] serpAnalysis Method Called:', {
       params,
       timestamp: new Date().toISOString(),
     });
@@ -242,6 +247,7 @@ export const backendAPI = {
       languageCode: params.languageCode || 'en',
     });
 
+    // FIXED: Backend uses /api prefix
     return debugFetch('/api/dataforseo/serp-analysis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -251,6 +257,7 @@ export const backendAPI = {
 
   /**
    * Health check with debug logs
+   * Backend uses /health (no /api prefix)
    */
   async healthCheck() {
     console.log('🩺 [DEBUG] healthCheck Method Called:', {
@@ -331,10 +338,10 @@ export const backendAPI = {
 
 // Helper: Auto-run connection test on client-side load for debug
 if (typeof window !== 'undefined') {
-  console.log('[DEBUG] Auto-Running API Connection Test on Page Load...');
+  console.log('🚀 [DEBUG] Auto-Running API Connection Test on Page Load...');
   backendAPI.testConnection().then((result) => {
     if (result.success) {
-      console.log('[DEBUG] Backend Connection Successful!', result.data);
+      console.log('🎉 [DEBUG] Backend Connection Successful!', result.data);
     } else {
       console.warn('⚠️ [DEBUG] Backend Connection Issue Detected!', result.error);
       console.table(result.diagnostics?.possibleCauses);

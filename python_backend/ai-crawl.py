@@ -9,10 +9,6 @@ from bs4 import BeautifulSoup
 from collections import Counter, defaultdict
 from urllib.parse import urlparse
 import logging
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -22,18 +18,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-
-# Get CORS origins from environment variable
-cors_origins = os.getenv("CORS_ORIGINS", '["*"]')
-try:
-    import json
-    origins = json.loads(cors_origins)
-except (json.JSONDecodeError, TypeError):
-    origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -663,19 +650,13 @@ def perform_semantic_gap_analysis(
 @app.get("/")
 async def root():
     """Return service metadata."""
-    return {
-        "service": "OrbiSEO AI Crawler",
-        "version": "1.0",
-        "status": "active",
-        "tagline": "See the meaning behind search",
-        "description": "AI-powered content analysis and semantic gap detection for crypto SEO"
-    }
+    return {"service": "Advanced Semantic Gap Analyzer", "version": "4.0", "status": "active"}
 
 
 @app.get("/health")
 async def health():
     """Return service health status."""
-    return {"status": "healthy", "version": "1.0", "nlp": "enabled", "service": "OrbiSEO AI Crawler"}
+    return {"status": "healthy", "version": "4.0", "nlp": "enabled"}
 
 
 @app.post("/api/crawl-url", response_model=CrawlResponse)
@@ -885,11 +866,8 @@ async def test_gap_analysis():
 
 if __name__ == "__main__":
     import uvicorn
-    import os
 
-    logger.info("Starting OrbiSEO AI Crawler v1.0")
-    logger.info("See the meaning behind search")
-    port = int(os.environ.get("PORT", 8001))
-    logger.info(f"Server running on http://localhost:{port}")
+    logger.info("Starting Advanced Semantic Gap Analyzer v4.0")
+    logger.info("Server running on http://localhost:8001")
     logger.info("API endpoints: POST /api/crawl-url, POST /api/test-gap-analysis")
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

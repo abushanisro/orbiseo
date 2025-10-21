@@ -1,13 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-# Removed unused imports
+from typing import List, Optional, Dict
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import logging
 import time
-from pinecone import Pinecone
+from pinecone import Pinecone, ServerlessSpec
 from pinecone_text.sparse import BM25Encoder
 from pathlib import Path
 import os
@@ -32,17 +32,9 @@ serp_logger = logging.getLogger("serp")
 
 app = FastAPI(title="Semantic SEO API", version="6.2.0-debug")
 
-# Get CORS origins from environment variable
-cors_origins = os.getenv("CORS_ORIGINS", '["*"]')
-try:
-    import json
-    origins = json.loads(cors_origins)
-except (json.JSONDecodeError, TypeError):
-    origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -183,10 +175,10 @@ def classify_intent_with_embeddings(query: str) -> tuple:
     """Classify intent using SentenceTransformer with debug logging"""
     global model
     
-    intent_logger.info(f"[INTENT] Starting intent classification for: '{query}'")
+    intent_logger.info(f"🎯 Starting intent classification for: '{query}'")
     
     if model is None:
-        intent_logger.warning("[INTENT] Model not loaded, using rule-based fallback")
+        intent_logger.warning("⚠️ Model not loaded, using rule-based fallback")
         return classify_intent_fallback(query), 0.6
     
     try:
@@ -213,17 +205,17 @@ def classify_intent_with_embeddings(query: str) -> tuple:
         best_intent = max(intent_scores, key=intent_scores.get)
         confidence = intent_scores[best_intent]
         
-        intent_logger.info(f"[INTENT] Intent scores: {intent_scores}")
-        intent_logger.info(f"[INTENT] Selected: {best_intent} (confidence: {confidence:.3f})")
+        intent_logger.info(f"✅ Intent scores: {intent_scores}")
+        intent_logger.info(f"✅ Selected: {best_intent} (confidence: {confidence:.3f})")
         
         if confidence < 0.3:
-            intent_logger.info("[INTENT] Low confidence, using rule-based fallback")
+            intent_logger.info("⚠️ Low confidence, using rule-based fallback")
             return classify_intent_fallback(query), 0.6
         
         return best_intent, confidence
         
     except Exception as e:
-        intent_logger.error(f"[ERROR] Error in intent classification: {e}")
+        intent_logger.error(f"❌ Error in intent classification: {e}")
         intent_logger.error(traceback.format_exc())
         return classify_intent_fallback(query), 0.6
 
@@ -238,7 +230,7 @@ def classify_intent_fallback(query: str) -> str:
         'buy now', 'get', 'subscribe', 'sign up', 'register', 'download'
     ]
     if any(keyword in query_lower for keyword in transactional_keywords):
-        intent_logger.info("[INTENT] Intent: transactional (keyword match)")
+        intent_logger.info(f"✅ Intent: transactional (keyword match)")
         return "transactional"
     
     commercial_keywords = [
@@ -247,7 +239,7 @@ def classify_intent_fallback(query: str) -> str:
         'pros and cons', 'affordable'
     ]
     if any(keyword in query_lower for keyword in commercial_keywords):
-        intent_logger.info("[INTENT] Intent: commercial (keyword match)")
+        intent_logger.info(f"✅ Intent: commercial (keyword match)")
         return "commercial"
     
     navigational_patterns = [
@@ -255,13 +247,13 @@ def classify_intent_fallback(query: str) -> str:
         'youtube', 'instagram', 'linkedin'
     ]
     if any(pattern in query_lower for pattern in navigational_patterns):
-        intent_logger.info("[INTENT] Intent: navigational (pattern match)")
+        intent_logger.info(f"✅ Intent: navigational (pattern match)")
         return "navigational"
     
     if len(query_lower.split()) <= 2 and not any(
         word in query_lower for word in ['how', 'what', 'why', 'when', 'where', 'who']
     ):
-        intent_logger.info("[INTENT] Intent: navigational (short query)")
+        intent_logger.info(f"✅ Intent: navigational (short query)")
         return "navigational"
     
     informational_keywords = [
@@ -270,10 +262,10 @@ def classify_intent_fallback(query: str) -> str:
         'ways to', 'benefits of', 'types of', 'list of', 'ideas'
     ]
     if any(keyword in query_lower for keyword in informational_keywords):
-        intent_logger.info("[INTENT] Intent: informational (keyword match)")
+        intent_logger.info(f"✅ Intent: informational (keyword match)")
         return "informational"
     
-    intent_logger.info("[INTENT] Intent: informational (default)")
+    intent_logger.info(f"✅ Intent: informational (default)")
     return "informational"
 
 def build_full_keyword_object(metadata: dict, score: float, rank: int) -> dict:
@@ -367,18 +359,18 @@ def build_full_keyword_object(metadata: dict, score: float, rank: int) -> dict:
     result["avg_competitor_gap"] = safe_float(metadata.get("avg_competitor_gap", metadata.get("Avg_Competitor_Gap")))
     result["best_opportunity_rank"] = safe_int(metadata.get("best_opportunity_rank", metadata.get("Best_Opportunity_Rank")))
     
-    logger.debug(f"[SUCCESS] Built keyword object: {result['keyword']}")
+    logger.debug(f"✅ Built keyword object: {result['keyword']}")
     return result
 
 def init_pinecone():
     """Initialize Pinecone with debug logging"""
     global pc, index
     
-    logger.info("[PINECONE] Initializing Pinecone connection...")
+    logger.info("🔌 Initializing Pinecone connection...")
     
     try:
         if not PINECONE_API_KEY:
-            logger.error("[ERROR] PINECONE_API_KEY not found in environment")
+            logger.error("❌ PINECONE_API_KEY not found in environment")
             logger.error(f"Environment variables: {list(os.environ.keys())}")
             return False
         
@@ -386,13 +378,13 @@ def init_pinecone():
         logger.debug(f"Index name: {PINECONE_INDEX_NAME}")
         
         pc = Pinecone(api_key=PINECONE_API_KEY)
-        logger.info("[SUCCESS] Pinecone client initialized")
+        logger.info("✅ Pinecone client initialized")
         
         index = pc.Index(PINECONE_INDEX_NAME)
-        logger.info(f"[SUCCESS] Connected to index: {PINECONE_INDEX_NAME}")
+        logger.info(f"✅ Connected to index: {PINECONE_INDEX_NAME}")
         
         stats = index.describe_index_stats()
-        logger.info("[SUCCESS] Index statistics:")
+        logger.info(f"✅ Index statistics:")
         logger.info(f"   - Total vectors: {stats.total_vector_count}")
         logger.info(f"   - Dimension: {stats.dimension}")
         logger.info(f"   - Namespaces: {stats.namespaces}")
@@ -400,7 +392,7 @@ def init_pinecone():
         return True
         
     except Exception as e:
-        logger.error(f"[ERROR] Failed to initialize Pinecone: {e}")
+        logger.error(f"❌ Failed to initialize Pinecone: {e}")
         logger.error(traceback.format_exc())
         return False
 
@@ -411,7 +403,7 @@ def create_sparse_vector(text: str):
     logger.debug(f"Creating sparse vector for: '{text[:50]}...'")
     
     if bm25_encoder is None:
-        logger.warning("[WARNING] BM25 encoder not initialized")
+        logger.warning("⚠️ BM25 encoder not initialized")
         return {'indices': [], 'values': []}
     
     try:
@@ -439,11 +431,11 @@ def create_sparse_vector(text: str):
             if hasattr(values, 'tolist'):
                 values = values.tolist()
         
-        logger.debug(f"[SUCCESS] Sparse vector created: {len(indices)} indices")
+        logger.debug(f"✅ Sparse vector created: {len(indices)} indices")
         return {'indices': indices, 'values': values}
         
     except Exception as e:
-        logger.error(f"[ERROR] Error encoding sparse vector: {e}")
+        logger.error(f"❌ Error encoding sparse vector: {e}")
         logger.error(traceback.format_exc())
         return {'indices': [], 'values': []}
 
@@ -451,10 +443,10 @@ def search_pinecone(query: str, top_k: int = 20, min_similarity: float = 0.5):
     """Search Pinecone with comprehensive debug logging"""
     global index
     
-    search_logger.info(f"[SEARCH] Searching Pinecone for: '{query}' (top_k={top_k}, min_sim={min_similarity})")
+    search_logger.info(f"🔍 Searching Pinecone for: '{query}' (top_k={top_k}, min_sim={min_similarity})")
     
     if index is None:
-        search_logger.error("[ERROR] Index not initialized")
+        search_logger.error("❌ Index not initialized")
         return []
     
     try:
@@ -462,7 +454,7 @@ def search_pinecone(query: str, top_k: int = 20, min_similarity: float = 0.5):
         sparse_vec = create_sparse_vector(query)
         
         if not sparse_vec['indices']:
-            search_logger.warning("[WARNING] Empty sparse vector generated")
+            search_logger.warning("⚠️ Empty sparse vector generated")
             return []
         
         search_logger.debug(f"Querying index with {len(sparse_vec['indices'])} sparse indices...")
@@ -474,7 +466,7 @@ def search_pinecone(query: str, top_k: int = 20, min_similarity: float = 0.5):
             include_metadata=True
         )
         
-        search_logger.info(f"[SUCCESS] Received {len(query_response.matches)} matches from Pinecone")
+        search_logger.info(f"✅ Received {len(query_response.matches)} matches from Pinecone")
         
         results = []
         for i, match in enumerate(query_response.matches):
@@ -499,11 +491,11 @@ def search_pinecone(query: str, top_k: int = 20, min_similarity: float = 0.5):
         for i, result in enumerate(results):
             result['rank'] = i + 1
         
-        search_logger.info(f"[SUCCESS] Returning {len(results)} filtered and ranked results")
+        search_logger.info(f"✅ Returning {len(results)} filtered and ranked results")
         return results
         
     except Exception as e:
-        search_logger.error(f"[ERROR] Pinecone search error: {e}")
+        search_logger.error(f"❌ Pinecone search error: {e}")
         search_logger.error(traceback.format_exc())
         return []
 
@@ -516,38 +508,38 @@ async def startup_event():
     global model, bm25_encoder
     
     logger.info("=" * 80)
-    logger.info("[STARTUP] Starting Semantic SEO API v6.2.0-debug")
+    logger.info("🚀 Starting Semantic SEO API v6.2.0-debug")
     logger.info("=" * 80)
     
     # Load embedding model
     try:
-        logger.info("[MODEL] Loading SentenceTransformer model...")
+        logger.info("📦 Loading SentenceTransformer model...")
         model = SentenceTransformer('all-MiniLM-L6-v2')
-        logger.info("[SUCCESS] SentenceTransformer model loaded successfully")
-        logger.info("   - Model: all-MiniLM-L6-v2")
+        logger.info(f"✅ SentenceTransformer model loaded successfully")
+        logger.info(f"   - Model: all-MiniLM-L6-v2")
         logger.info(f"   - Embedding dimension: {model.get_sentence_embedding_dimension()}")
     except Exception as e:
-        logger.error(f"[ERROR] Model load failed: {e}")
+        logger.error(f"❌ Model load failed: {e}")
         logger.error(traceback.format_exc())
         raise
     
     # Initialize BM25 encoder
     try:
-        logger.info("[BM25] Initializing BM25 encoder...")
+        logger.info("📦 Initializing BM25 encoder...")
         bm25_encoder = BM25Encoder.default()
-        logger.info("[SUCCESS] BM25 encoder initialized successfully")
+        logger.info("✅ BM25 encoder initialized successfully")
     except Exception as e:
-        logger.warning(f"[WARNING] BM25 encoder init failed: {e}")
+        logger.warning(f"⚠️ BM25 encoder init failed: {e}")
         logger.warning(traceback.format_exc())
     
     # Initialize Pinecone
     if init_pinecone():
-        logger.info(f"[SUCCESS] Pinecone ready: {PINECONE_INDEX_NAME}")
+        logger.info(f"✅ Pinecone ready: {PINECONE_INDEX_NAME}")
     else:
-        logger.warning("[WARNING] Pinecone not loaded - searches will fail")
+        logger.warning("⚠️ Pinecone not loaded - searches will fail")
     
     logger.info("=" * 80)
-    logger.info("[SUCCESS] API Ready with Full Debug Logging!")
+    logger.info("✅ API Ready with Full Debug Logging!")
     logger.info("=" * 80)
 
 # ============================================
@@ -556,7 +548,7 @@ async def startup_event():
 
 @app.get("/")
 async def root():
-    logger.info("[ROOT] Root endpoint accessed")
+    logger.info("📍 Root endpoint accessed")
     return {
         "name": "Semantic SEO API",
         "version": "6.2.0-debug",
@@ -574,7 +566,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    logger.debug("[HEALTH] Health check requested")
+    logger.debug("🏥 Health check requested")
     
     index_stats = None
     if index:
@@ -601,14 +593,14 @@ async def health_check():
         "debug_mode": True
     }
     
-    logger.info(f"[SUCCESS] Health check: {health_data}")
+    logger.info(f"✅ Health check: {health_data}")
     return health_data
 
 @app.post("/api/semantic-search-live")
 async def semantic_search_live(request: SemanticSearchRequest):
     """Enhanced search with comprehensive debug logging"""
     logger.info("=" * 80)
-    logger.info("[SEARCH] SEMANTIC SEARCH REQUEST")
+    logger.info(f"🔍 SEMANTIC SEARCH REQUEST")
     logger.info(f"   Query: '{request.query}'")
     logger.info(f"   TopK: {request.topK}")
     logger.info(f"   Include Intent: {request.includeIntent}")
@@ -616,18 +608,18 @@ async def semantic_search_live(request: SemanticSearchRequest):
     logger.info("=" * 80)
     
     if not index:
-        logger.error("[ERROR] Pinecone not connected")
+        logger.error("❌ Pinecone not connected")
         raise HTTPException(status_code=503, detail="Pinecone not connected")
     
     try:
         # Search Pinecone
-        logger.info("[SEARCH] Starting Pinecone search...")
+        logger.info("🔎 Starting Pinecone search...")
         matches = search_pinecone(
             query=request.query,
             top_k=request.topK,
             min_similarity=request.minSimilarity
         )
-        logger.info(f"[SUCCESS] Found {len(matches)} matches")
+        logger.info(f"✅ Found {len(matches)} matches")
         
         # Classify intent
         intent = "informational"
@@ -635,20 +627,20 @@ async def semantic_search_live(request: SemanticSearchRequest):
         intent_method = "default"
         
         if request.includeIntent:
-            logger.info("[INTENT] Classifying intent...")
+            logger.info("🎯 Classifying intent...")
             try:
                 intent, intent_confidence = classify_intent_with_embeddings(request.query)
                 intent_method = "semantic_embeddings"
-                logger.info(f"[SUCCESS] Intent: {intent} (confidence: {intent_confidence:.3f}, method: {intent_method})")
+                logger.info(f"✅ Intent: {intent} (confidence: {intent_confidence:.3f}, method: {intent_method})")
             except Exception as e:
-                logger.error(f"[ERROR] Intent detection error: {e}")
+                logger.error(f"❌ Intent detection error: {e}")
                 logger.error(traceback.format_exc())
                 intent = classify_intent_fallback(request.query)
                 intent_confidence = 0.6
                 intent_method = "rule_based"
         
         # Calculate aggregate metrics
-        logger.debug("[METRICS] Calculating aggregate metrics...")
+        logger.debug("📊 Calculating aggregate metrics...")
         total_volume = sum(m.get('search_volume', 0) for m in matches)
         difficulties = [m.get('keyword_difficulty', 0) for m in matches if m.get('keyword_difficulty', 0) > 0]
         cpcs = [m.get('cpc', 0) for m in matches if m.get('cpc', 0) > 0]
@@ -656,7 +648,7 @@ async def semantic_search_live(request: SemanticSearchRequest):
         avg_difficulty = np.mean(difficulties) if difficulties else 0
         avg_cpc = np.mean(cpcs) if cpcs else 0
         
-        logger.info(f"[METRICS] Metrics: volume={total_volume}, avg_kd={avg_difficulty:.2f}, avg_cpc={avg_cpc:.2f}")
+        logger.info(f"📊 Metrics: volume={total_volume}, avg_kd={avg_difficulty:.2f}, avg_cpc={avg_cpc:.2f}")
         
         response_data = {
             "query": request.query,
@@ -674,12 +666,12 @@ async def semantic_search_live(request: SemanticSearchRequest):
             "database": "Pinecone (orbiseo)"
         }
         
-        logger.info("[SUCCESS] Search completed successfully")
+        logger.info("✅ Search completed successfully")
         logger.info("=" * 80)
         return response_data
     
     except Exception as e:
-        logger.error(f"[ERROR] Search error: {e}")
+        logger.error(f"❌ Search error: {e}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -687,26 +679,26 @@ async def semantic_search_live(request: SemanticSearchRequest):
 async def expand_keywords(request: KeywordExpansionRequest):
     """Keyword expansion with full debug logging"""
     logger.info("=" * 80)
-    logger.info("[EXPANSION] KEYWORD EXPANSION REQUEST")
+    logger.info(f"📈 KEYWORD EXPANSION REQUEST")
     logger.info(f"   Seed: '{request.seed_keyword}'")
     logger.info(f"   Count: {request.expansion_count}")
     logger.info("=" * 80)
     
     if not index:
-        logger.error("[ERROR] Pinecone not connected")
+        logger.error("❌ Pinecone not connected")
         raise HTTPException(status_code=503, detail="Pinecone not connected")
     
     try:
-        logger.info("[EXPANSION] Expanding keywords...")
+        logger.info("🔎 Expanding keywords...")
         expanded = search_pinecone(
             query=request.seed_keyword,
             top_k=request.expansion_count,
             min_similarity=0.3
         )
-        logger.info(f"[SUCCESS] Expanded to {len(expanded)} keywords")
+        logger.info(f"✅ Expanded to {len(expanded)} keywords")
         
         # Calculate metrics
-        logger.debug("[METRICS] Calculating expansion metrics...")
+        logger.debug("📊 Calculating expansion metrics...")
         total_volume = sum(kw.get("search_volume", 0) for kw in expanded)
         comps = [kw.get("keyword_difficulty", 0) for kw in expanded if kw.get("keyword_difficulty", 0) > 0]
         cpcs = [kw.get("cpc", 0) for kw in expanded if kw.get("cpc", 0) > 0]
@@ -714,7 +706,7 @@ async def expand_keywords(request: KeywordExpansionRequest):
         avg_comp = np.mean(comps) if comps else 0
         avg_cpc_val = np.mean(cpcs) if cpcs else 0
         
-        logger.info(f"[METRICS] Expansion metrics: volume={total_volume}, avg_comp={avg_comp:.2f}")
+        logger.info(f"📊 Expansion metrics: volume={total_volume}, avg_comp={avg_comp:.2f}")
         
         response_data = {
             "seed_keyword": request.seed_keyword,
@@ -728,46 +720,50 @@ async def expand_keywords(request: KeywordExpansionRequest):
             }
         }
         
-        logger.info("[SUCCESS] Expansion completed successfully")
+        logger.info("✅ Expansion completed successfully")
         logger.info("=" * 80)
         return response_data
     
     except Exception as e:
-        logger.error(f"[ERROR] Expansion error: {e}")
+        logger.error(f"❌ Expansion error: {e}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
+# REPLACE the serp_analysis endpoint in your main.py with this fixed version
+
 @app.post("/api/dataforseo/serp-analysis")
 async def serp_analysis(request: SERPAnalysisRequest):
-    """Enhanced SERP analysis with comprehensive debug logging and NaN handling"""
+    """
+    Enhanced SERP analysis with comprehensive debug logging and NaN handling
+    """
     serp_logger.info("=" * 80)
-    serp_logger.info("[SERP] SERP ANALYSIS REQUEST")
+    serp_logger.info(f"🌐 SERP ANALYSIS REQUEST")
     serp_logger.info(f"   Keyword: '{request.keyword}'")
     serp_logger.info(f"   Location: {request.locationCode}")
     serp_logger.info(f"   Language: {request.languageCode}")
     serp_logger.info("=" * 80)
     
     if not index:
-        serp_logger.error("[ERROR] Pinecone not connected")
+        serp_logger.error("❌ Pinecone not connected")
         raise HTTPException(status_code=503, detail="Pinecone not connected")
     
     try:
         # Search for the keyword and related terms
-        serp_logger.info("[SERP] Searching for keyword and related terms...")
+        serp_logger.info("🔎 Searching for keyword and related terms...")
         matches = search_pinecone(
             query=request.keyword,
             top_k=20,
             min_similarity=0.5
         )
-        serp_logger.info(f"[SUCCESS] Found {len(matches)} matches")
+        serp_logger.info(f"✅ Found {len(matches)} matches")
         
         # Classify intent
-        serp_logger.info("[INTENT] Classifying search intent...")
+        serp_logger.info("🎯 Classifying search intent...")
         intent, intent_confidence = classify_intent_with_embeddings(request.keyword)
-        serp_logger.info(f"[SUCCESS] Intent: {intent} (confidence: {intent_confidence:.3f})")
+        serp_logger.info(f"✅ Intent: {intent} (confidence: {intent_confidence:.3f})")
         
         # Extract organic results from competitor data
-        serp_logger.info("[COMPETITORS] Extracting competitor data...")
+        serp_logger.info("🏆 Extracting competitor data...")
         organic_results = []
         seen_urls = set()
         
@@ -804,19 +800,19 @@ async def serp_analysis(request: SERPAnalysisRequest):
         
         # Sort by position
         organic_results.sort(key=lambda x: x['position'])
-        serp_logger.info(f"[SUCCESS] Extracted {len(organic_results)} organic results")
+        serp_logger.info(f"✅ Extracted {len(organic_results)} organic results")
         
         # Generate related searches from semantic matches
-        serp_logger.info("[RELATED] Generating related searches...")
+        serp_logger.info("🔗 Generating related searches...")
         related_searches = [
             m.get('keyword', '') 
             for m in matches[:15] 
             if m.get('keyword') and m.get('keyword') != request.keyword
         ]
-        serp_logger.info(f"[SUCCESS] Found {len(related_searches)} related searches")
+        serp_logger.info(f"✅ Found {len(related_searches)} related searches")
         
         # Calculate SERP metrics with proper NaN handling
-        serp_logger.info("[METRICS] Calculating SERP metrics...")
+        serp_logger.info("📊 Calculating SERP metrics...")
         
         # Calculate average DA
         da_values = [r['domain_authority'] for r in organic_results if r.get('domain_authority', 0) > 0]
@@ -845,49 +841,49 @@ async def serp_analysis(request: SERPAnalysisRequest):
         serp_logger.info(f"   Avg Backlinks: {avg_backlinks:.0f}")
         
         # Generate AI recommendations based on data
-        serp_logger.info("[AI] Generating AI recommendations...")
+        serp_logger.info("🤖 Generating AI recommendations...")
         ai_recommendations = []
         
         # Intent-based recommendations
         if intent == "informational":
-            ai_recommendations.append("Create comprehensive guide content about '{}' with tutorials and examples".format(request.keyword))
+            ai_recommendations.append(f"Create comprehensive guide content about '{request.keyword}' with tutorials and examples")
             ai_recommendations.append("Focus on answering common questions and providing educational value")
             ai_recommendations.append("Include how-to guides, definitions, and step-by-step instructions")
         elif intent == "transactional":
-            ai_recommendations.append("Optimize product/service pages for '{}' with clear CTAs".format(request.keyword))
+            ai_recommendations.append(f"Optimize product/service pages for '{request.keyword}' with clear CTAs")
             ai_recommendations.append("Include pricing, features, and customer testimonials")
             ai_recommendations.append("Add trust signals like guarantees, secure checkout badges, and reviews")
         elif intent == "commercial":
-            ai_recommendations.append("Create comparison and review content for '{}'".format(request.keyword))
+            ai_recommendations.append(f"Create comparison and review content for '{request.keyword}'")
             ai_recommendations.append("Include pros/cons, alternatives, and buying guides")
             ai_recommendations.append("Add comparison tables, feature matrices, and expert recommendations")
         elif intent == "navigational":
-            ai_recommendations.append("Ensure brand pages are optimized for '{}'".format(request.keyword))
+            ai_recommendations.append(f"Ensure brand pages are optimized for '{request.keyword}'")
             ai_recommendations.append("Focus on brand authority and direct navigation paths")
             ai_recommendations.append("Optimize homepage and key landing pages for brand searches")
         
         # Competition-based recommendations
         if avg_da > 60:
-            ai_recommendations.append("[WARNING] Very high competition (Avg DA: {:.0f}). Focus on long-tail variations and niche angles".format(avg_da))
-            ai_recommendations.append("Consider targeting keywords with DA < 40 for quicker wins")
+            ai_recommendations.append(f"⚠️ Very high competition (Avg DA: {avg_da:.0f}). Focus on long-tail variations and niche angles")
+            ai_recommendations.append(f"Consider targeting keywords with DA < 40 for quicker wins")
         elif avg_da > 40:
-            ai_recommendations.append("Moderate-high competition (Avg DA: {:.0f}). Build topical authority with supporting content".format(avg_da))
+            ai_recommendations.append(f"Moderate-high competition (Avg DA: {avg_da:.0f}). Build topical authority with supporting content")
         else:
-            ai_recommendations.append("[SUCCESS] Lower competition (Avg DA: {:.0f}). Good opportunity for ranking with quality content".format(avg_da))
+            ai_recommendations.append(f"✅ Lower competition (Avg DA: {avg_da:.0f}). Good opportunity for ranking with quality content")
         
         # Keyword difficulty recommendations
         if avg_kd > 60:
-            ai_recommendations.append("High keyword difficulty ({:.0f}). Plan 6-12 month SEO campaign with strong backlink strategy".format(avg_kd))
+            ai_recommendations.append(f"High keyword difficulty ({avg_kd:.0f}). Plan 6-12 month SEO campaign with strong backlink strategy")
         elif avg_kd > 40:
-            ai_recommendations.append("Moderate keyword difficulty ({:.0f}). Focus on content quality and on-page optimization".format(avg_kd))
+            ai_recommendations.append(f"Moderate keyword difficulty ({avg_kd:.0f}). Focus on content quality and on-page optimization")
         else:
-            ai_recommendations.append("Lower keyword difficulty ({:.0f}). Quick win opportunity with solid content".format(avg_kd))
+            ai_recommendations.append(f"Lower keyword difficulty ({avg_kd:.0f}). Quick win opportunity with solid content")
         
         # Backlink recommendations
         if avg_backlinks > 1000:
-            ai_recommendations.append("Competitors have strong backlink profiles (avg {:.0f} links). Prioritize link building".format(avg_backlinks))
+            ai_recommendations.append(f"Competitors have strong backlink profiles (avg {avg_backlinks:.0f} links). Prioritize link building")
         elif avg_backlinks > 100:
-            ai_recommendations.append("Moderate backlink requirement (avg {:.0f} links). Focus on quality over quantity".format(avg_backlinks))
+            ai_recommendations.append(f"Moderate backlink requirement (avg {avg_backlinks:.0f} links). Focus on quality over quantity")
         
         # Content gap recommendations
         if matches:
@@ -899,36 +895,36 @@ async def serp_analysis(request: SERPAnalysisRequest):
             
             if missing_entities_set:
                 entities_list = list(missing_entities_set)[:5]
-                ai_recommendations.append("[CONTENT] Cover missing entities: {}".format(', '.join(entities_list)))
+                ai_recommendations.append(f"📝 Cover missing entities: {', '.join(entities_list)}")
                 serp_logger.debug(f"   Missing entities: {entities_list}")
         
         # Topical authority recommendation
         parent_topics = set(m.get('parent_topic', '') for m in matches[:10] if m.get('parent_topic') and m.get('parent_topic') != '-')
         if parent_topics:
             topics_list = list(parent_topics)[:3]
-            ai_recommendations.append("[TOPIC] Build topical authority around: {}".format(', '.join(topics_list)))
+            ai_recommendations.append(f"🎯 Build topical authority around: {', '.join(topics_list)}")
             serp_logger.debug(f"   Parent topics: {topics_list}")
         
         # Volume and content recommendations
         total_search_volume = sum(m.get('search_volume', 0) for m in matches[:5])
-        ai_recommendations.append("[METRICS] Target search volume: {:,} (top 5 related keywords)".format(total_search_volume))
+        ai_recommendations.append(f"📊 Target search volume: {total_search_volume:,} (top 5 related keywords)")
         
         if avg_kd > 50:
-            ai_recommendations.append("[CONTENT] Recommended content depth: 2000+ words with comprehensive semantic keyword coverage")
+            ai_recommendations.append(f"📝 Recommended content depth: 2000+ words with comprehensive semantic keyword coverage")
         elif avg_kd > 30:
-            ai_recommendations.append("[CONTENT] Recommended content depth: 1500+ words with good semantic keyword coverage")
+            ai_recommendations.append(f"📝 Recommended content depth: 1500+ words with good semantic keyword coverage")
         else:
-            ai_recommendations.append("[CONTENT] Recommended content depth: 1000+ words with focused keyword targeting")
+            ai_recommendations.append(f"📝 Recommended content depth: 1000+ words with focused keyword targeting")
         
         # Semantic cluster recommendations
         clusters = set(m.get('semantic_cluster', '') for m in matches if m.get('semantic_cluster') and m.get('semantic_cluster') != '-')
         if clusters:
-            ai_recommendations.append("[CLUSTER] Create content hubs around semantic clusters: {}".format(', '.join(list(clusters)[:3])))
+            ai_recommendations.append(f"🔗 Create content hubs around semantic clusters: {', '.join(list(clusters)[:3])}")
         
-        serp_logger.info(f"[SUCCESS] Generated {len(ai_recommendations)} recommendations")
+        serp_logger.info(f"✅ Generated {len(ai_recommendations)} recommendations")
         
         # Content opportunities
-        serp_logger.info("[OPPORTUNITIES] Identifying content opportunities...")
+        serp_logger.info("💡 Identifying content opportunities...")
         high_volume_kws = [m['keyword'] for m in matches if m.get('search_volume', 0) > 1000][:10]
         low_comp_kws = [m['keyword'] for m in matches if m.get('keyword_difficulty', 100) < 30][:10]
         semantic_clusters = list(set(m.get('semantic_cluster', '') for m in matches if m.get('semantic_cluster') and m.get('semantic_cluster') != '-'))[:5]
@@ -975,19 +971,19 @@ async def serp_analysis(request: SERPAnalysisRequest):
             "analysis_timestamp": time.time()
         }
         
-        serp_logger.info("[SUCCESS] SERP analysis completed successfully")
+        serp_logger.info("✅ SERP analysis completed successfully")
         serp_logger.info("=" * 80)
         return response_data
     
     except Exception as e:
-        serp_logger.error(f"[ERROR] SERP analysis error: {e}")
+        serp_logger.error(f"❌ SERP analysis error: {e}")
         serp_logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"SERP analysis failed: {str(e)}")
 
 @app.get("/debug/test-search/{query}")
 async def test_search(query: str, top_k: int = 5):
     """Test search functionality for debugging"""
-    logger.info(f"[DEBUG] Testing search for: '{query}' (top_k={top_k})")
+    logger.info(f"🧪 Testing search for: '{query}' (top_k={top_k})")
     
     try:
         results = search_pinecone(query, top_k=top_k)
@@ -1015,12 +1011,10 @@ async def get_recent_logs():
 
 if __name__ == "__main__":
     import uvicorn
-    import os
-    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=False,
-        log_level="info"
+        "main:app", 
+        host="0.0.0.0", 
+        port=8000, 
+        reload=True,
+        log_level="debug"
     )
